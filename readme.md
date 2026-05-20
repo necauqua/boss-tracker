@@ -1,4 +1,4 @@
-# check-your-privilege
+# Boss Tracker (a Noita mod)
 
 ![preview](./workshop-preview.png)
 
