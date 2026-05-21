@@ -52,23 +52,13 @@ export const countBosses = () =>
 
 export const trackBoss = (name: string) => {
   if (bossKilled(name)) {
-    return;
+    return false;
   }
+
   GlobalsSetValue(`${MOD_ID}.killed.${name}`, "1");
 
-  if (!gateBoss.names.includes(name)) {
-    return true;
-  }
-
-  if (increment("gates") == 4) {
-    GlobalsSetValue(`${MOD_ID}.killed.${gateBoss.flag}`, "1");
-    return true;
-  }
-};
-
-const increment = (name: string) => {
-  const key = `${MOD_ID}.${name}`;
-  const value = tonumber(GlobalsGetValue(key, "0"))! + 1;
-  GlobalsSetValue(key, tostring(value));
-  return value;
+  return (
+    !gateBoss.names.includes(name) ||
+    gateBoss.names.every((name) => bossKilled(name))
+  );
 };
