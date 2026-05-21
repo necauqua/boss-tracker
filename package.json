@@ -8,7 +8,7 @@
   "noita.name": "Boss Tracker",
   "noita.compat": 12,
   "noita.workshop.name": "Boss Tracker",
-  "noita.workshop.description": "An improved boss kill tracker.\nCheck the mod settings for a little bit of UI config.\n\n\nThis is an improved version of the 'boss kill message' by syagami that adds some UI elements as well as hopefully improves the boss kill detection (technical: we add the death callback via nxml instead of at runtime)",
+  "noita.workshop.description": "An improved boss kill tracker.\nCheck the mod settings for a little bit of UI config.\n\nThis is an improved version of the 'boss kill message' by syagami that adds some UI elements as well as hopefully improves the boss kill detection (technical: we add the death callback via nxml instead of at runtime).\n\nCheck out the source code at https://github.com/necauqua/boss-tracker",
   "scripts": {
     "start": "nts run",
     "build": "nts build"
