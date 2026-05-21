@@ -56,13 +56,14 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
       return;
     }
 
+    const gap = mod.settings.gap;
     const [_1, _2, _3, lastX, y, lastWidth] = GuiGetPreviousWidgetInfo(gui);
 
     let x = lastX + lastWidth + 3;
     for (const boss of bosses) {
       if (!bossKilled(boss.flag)) {
         GuiImage(gui, y, x, y + 1, boss.icon, 1, 1);
-        x += 9;
+        x += 8 + gap;
       }
     }
     return;
