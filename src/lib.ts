@@ -5,6 +5,7 @@ const mkBoss = (name: string, community_name: string, xml: string) => ({
   community_name,
   names: [`$animal_${name}`],
   xml_files: [`data/entities/animals/${xml}.xml`],
+  icon: `mods/${MOD_ID}/icons/${name}.png`,
 });
 
 const gateBoss = {
@@ -22,6 +23,7 @@ const gateBoss = {
     "data/entities/animals/boss_gate/gate_monster_c.xml",
     "data/entities/animals/boss_gate/gate_monster_d.xml",
   ],
+  icon: `mods/${MOD_ID}/icons/gate_monster.png`,
 };
 
 export const bosses = [

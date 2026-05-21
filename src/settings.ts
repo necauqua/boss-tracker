@@ -4,10 +4,11 @@ declare global {
   > {}
 }
 
-export type UiSetup = "none" | "todo" | "checkmarks";
+export type UiSetup = "none" | "short-todo" | "todo" | "checkmarks";
 
 const ui_setups = [
   ["none", "None"],
+  ["short-todo", "List remaining bosses icons only"],
   ["todo", "List remaining bosses"],
   ["checkmarks", "List all bosses with checkmarks"],
 ] as [UiSetup, string][];
@@ -19,7 +20,7 @@ export default [
     ui_description:
       "Choose the way of showing the boss list when the game is not paused",
     values: ui_setups,
-    value_default: "none",
+    value_default: "short-todo",
     scope: ModSettingScope.Runtime,
   },
   {

@@ -1,7 +1,7 @@
 import { MOD_ID } from "$mod";
 import mod from "@noita-ts/base";
 import nxml from "@noita-ts/nxml";
-import { bosses, countBosses, bossKilled } from "./lib";
+import { bosses, bossKilled, countBosses } from "./lib";
 import type { UiSetup } from "./settings";
 
 for (const { xml_files } of bosses) {
@@ -51,6 +51,23 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
     t = tf = (_, c) => c;
   }
 
+  if (ui_setup === "short-todo") {
+    if (count === bosses.length) {
+      return;
+    }
+
+    const [_1, _2, _3, lastX, y, lastWidth] = GuiGetPreviousWidgetInfo(gui);
+
+    let x = lastX + lastWidth + 3;
+    for (const boss of bosses) {
+      if (!bossKilled(boss.flag)) {
+        GuiImage(gui, y, x, y + 1, boss.icon, 1, 1);
+        x += 9;
+      }
+    }
+    return;
+  }
+
   if (ui_setup === "todo") {
     if (count === bosses.length) {
       return;
@@ -65,23 +82,37 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
         continue;
       }
 
-      const name = tf(boss.names, boss.community_name);
       y += 10;
-      GuiText(gui, 15, y, `${name}`);
+
+      GuiImage(gui, y, 15, y + 1, boss.icon, 1, 1);
+      GuiText(gui, 25, y, tf(boss.names, boss.community_name));
     }
     return;
   }
 
+  const x = 15;
   for (const boss of bosses) {
     y += 10;
 
+    // manually offseting the text as space and 'x' have different widths in noitapixel
+    //  (and x is way too wide lol)
+
+    const DrawSemiTransparent = 26;
+
     if (bossKilled(boss.flag)) {
-      GuiOptionsAddForNextWidget(gui, 26); // DrawSemiTransparent
-      GuiText(gui, 15, y, `[x] ${t(boss.names, boss.community_name)}`);
+      GuiOptionsAdd(gui, DrawSemiTransparent);
+
+      GuiText(gui, x, y, `[`);
+      GuiText(gui, x + 5, y, "x]");
+      GuiImage(gui, y, x + 16, y + 1, boss.icon, 0.25, 1);
+      GuiText(gui, x + 26, y, t(boss.names, boss.community_name));
+
+      GuiOptionsRemove(gui, DrawSemiTransparent);
     } else {
-      // manually offset the text as space and 'x' have different widths in noitapixel
-      GuiText(gui, 15, y, `[`);
-      GuiText(gui, 23, y, `] ${tf(boss.names, boss.community_name)}`);
+      GuiText(gui, x, y, "[");
+      GuiText(gui, x + 9, y, "]");
+      GuiImage(gui, y, x + 16, y + 1, boss.icon, 1, 1);
+      GuiText(gui, x + 26, y, tf(boss.names, boss.community_name));
     }
   }
 };
