@@ -4,14 +4,23 @@ declare global {
   > {}
 }
 
-export type UiSetup = "none" | "short-todo" | "todo" | "checkmarks";
-
 const ui_setups = [
   ["none", "None"],
   ["short-todo", "List remaining bosses icons only"],
   ["todo", "List remaining bosses"],
   ["checkmarks", "List all bosses with checkmarks"],
-] as [UiSetup, string][];
+] as const satisfies [string, string][];
+
+export type UiSetup = (typeof ui_setups)[number][0];
+
+const use_community_names: ModSettingCheckbox & { id: "use_community_names" } =
+  {
+    id: "use_community_names",
+    ui_name: "Use Community Names",
+    ui_description: "Toggle the use of community names for bosses",
+    value_default: false,
+    scope: ModSettingScope.Runtime,
+  };
 
 const gap: ModSettingSlider & { id: "gap" } = {
   id: "gap",
@@ -23,8 +32,8 @@ const gap: ModSettingSlider & { id: "gap" } = {
   scope: ModSettingScope.Runtime,
 };
 
-let ingameShort = false;
-let pausedShort = false;
+let ingameUi = "short-todo";
+let pausedUi = "checkmarks";
 
 export default [
   {
@@ -36,8 +45,11 @@ export default [
     value_default: "short-todo",
     scope: ModSettingScope.Runtime,
     onchange: ({ new_value }) => {
-      ingameShort = new_value === "short-todo";
-      gap.hidden = !(ingameShort || pausedShort);
+      ingameUi = new_value;
+      gap.hidden = !(new_value == "short-todo" || pausedUi == "short-todo");
+      use_community_names.hidden =
+        (new_value == "none" || new_value == "short-todo") &&
+        (pausedUi == "none" || pausedUi == "short-todo");
     },
   },
   {
@@ -49,16 +61,13 @@ export default [
     value_default: "checkmarks",
     scope: ModSettingScope.Runtime,
     onchange: ({ new_value }) => {
-      pausedShort = new_value === "short-todo";
-      gap.hidden = !(ingameShort || pausedShort);
+      pausedUi = new_value;
+      gap.hidden = !(new_value == "short-todo" || ingameUi == "short-todo");
+      use_community_names.hidden =
+        (new_value == "none" || new_value == "short-todo") &&
+        (ingameUi == "none" || ingameUi == "short-todo");
     },
   },
-  {
-    id: "use_community_names",
-    ui_name: "Use Community Names",
-    ui_description: "Toggle the use of community names for bosses",
-    value_default: false,
-    scope: ModSettingScope.Runtime,
-  },
+  use_community_names,
   gap,
 ] as const satisfies ModSetting[];

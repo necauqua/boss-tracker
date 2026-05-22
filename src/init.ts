@@ -91,31 +91,35 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
     return;
   }
 
-  const x = 15;
-  for (const boss of bosses) {
-    y += 10;
+  if (ui_setup === "checkmarks") {
+    const x = 15;
+    for (const boss of bosses) {
+      y += 10;
 
-    // manually offseting the text as space and 'x' have different widths in noitapixel
-    //  (and x is way too wide lol)
+      // manually offseting the text as space and 'x' have different widths in noitapixel
+      //  (and x is way too wide lol)
 
-    const DrawSemiTransparent = 26;
+      if (bossKilled(boss.flag)) {
+        const DrawSemiTransparent = 26;
+        GuiOptionsAdd(gui, DrawSemiTransparent);
 
-    if (bossKilled(boss.flag)) {
-      GuiOptionsAdd(gui, DrawSemiTransparent);
+        GuiText(gui, x, y, `[`);
+        GuiText(gui, x + 5, y, "x]");
+        GuiImage(gui, y, x + 16, y + 1, boss.icon, 0.25, 1);
+        GuiText(gui, x + 26, y, t(boss.names, boss.community_name));
 
-      GuiText(gui, x, y, `[`);
-      GuiText(gui, x + 5, y, "x]");
-      GuiImage(gui, y, x + 16, y + 1, boss.icon, 0.25, 1);
-      GuiText(gui, x + 26, y, t(boss.names, boss.community_name));
-
-      GuiOptionsRemove(gui, DrawSemiTransparent);
-    } else {
-      GuiText(gui, x, y, "[");
-      GuiText(gui, x + 9, y, "]");
-      GuiImage(gui, y, x + 16, y + 1, boss.icon, 1, 1);
-      GuiText(gui, x + 26, y, tf(boss.names, boss.community_name));
+        GuiOptionsRemove(gui, DrawSemiTransparent);
+      } else {
+        GuiText(gui, x, y, "[");
+        GuiText(gui, x + 9, y, "]");
+        GuiImage(gui, y, x + 16, y + 1, boss.icon, 1, 1);
+        GuiText(gui, x + 26, y, tf(boss.names, boss.community_name));
+      }
     }
+    return;
   }
+
+  ui_setup satisfies never;
 };
 
 mod.on("WorldPostUpdate", () => {
