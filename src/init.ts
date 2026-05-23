@@ -19,8 +19,8 @@ let gui: GuiID | null = null;
 
 const translate = (names: string[], _community_name: string) => {
   const parts = names.map((n) => GameTextGetTranslatedOrNot(n));
-  if (parts.length <= 1) return parts[1] ?? "";
-  if (parts.length === 2) return `${parts[1]} and ${parts[2]}`;
+  if (parts.length <= 1) return parts[0] ?? "";
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
   return `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}`;
 };
 
