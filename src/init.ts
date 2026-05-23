@@ -1,7 +1,7 @@
-import { MOD_ID } from "$mod";
+import { DEV, MOD_ID } from "$mod";
 import mod from "@noita-ts/base";
 import nxml from "@noita-ts/nxml";
-import { bosses, bossKilled, countBosses } from "./lib";
+import { bosses, countBosses, isFlagSet, setFlag } from "./lib";
 import type { UiSetup } from "./settings";
 
 for (const { xml_files } of bosses) {
@@ -26,7 +26,7 @@ const translate = (names: string[], _community_name: string) => {
 
 const translateFunny = (names: string[], community_name: string) => {
   if (names.length !== 1) {
-    const aliveNames = names.filter((name) => !bossKilled(name));
+    const aliveNames = names.filter((name) => !isFlagSet(name));
     if (aliveNames.length != 0) {
       names = aliveNames;
     }
@@ -61,7 +61,7 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
 
     let x = lastX + lastWidth + 3;
     for (const boss of bosses) {
-      if (!bossKilled(boss.flag)) {
+      if (!boss.killed()) {
         GuiImage(gui, y, x, y + 1, boss.icon, 1, 1);
         x += 8 + gap;
       }
@@ -79,7 +79,7 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
     GuiText(gui, 10, y, `Remaining:`);
 
     for (const boss of bosses) {
-      if (bossKilled(boss.flag)) {
+      if (boss.killed()) {
         continue;
       }
 
@@ -99,7 +99,7 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
       // manually offseting the text as space and 'x' have different widths in noitapixel
       //  (and x is way too wide lol)
 
-      if (bossKilled(boss.flag)) {
+      if (boss.killed()) {
         const DrawSemiTransparent = 26;
         GuiOptionsAdd(gui, DrawSemiTransparent);
 
@@ -107,6 +107,18 @@ const render = (ui_setup: UiSetup, y: number = 10) => {
         GuiText(gui, x + 5, y, "x]");
         GuiImage(gui, y, x + 16, y + 1, boss.icon, 0.25, 1);
         GuiText(gui, x + 26, y, t(boss.names, boss.community_name));
+
+        if (DEV) {
+          const [_1, _2, _3, lastX, lastY, lastWidth] =
+            GuiGetPreviousWidgetInfo(gui);
+          const bx = lastX + lastWidth + 3;
+          const [clicked] = GuiButton(gui, y + 123123, bx, lastY, "[clear]");
+          if (clicked) {
+            for (const name of boss.names) {
+              setFlag(name, false);
+            }
+          }
+        }
 
         GuiOptionsRemove(gui, DrawSemiTransparent);
       } else {

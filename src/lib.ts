@@ -1,22 +1,23 @@
 import { MOD_ID } from "$mod";
 
 const mkBoss = (name: string, community_name: string, xml: string) => ({
-  flag: `$animal_${name}`,
-  community_name,
   names: [`$animal_${name}`],
+  community_name,
   xml_files: [`data/entities/animals/${xml}.xml`],
   icon: `mods/${MOD_ID}/icons/${name}.png`,
+  killed() {
+    return this.names.every((name) => isFlagSet(name));
+  },
 });
 
 const gateBoss = {
-  flag: "$animal_gate_monster",
-  community_name: "Triangle/Gate",
   names: [
     "$animal_gate_monster_a",
     "$animal_gate_monster_b",
     "$animal_gate_monster_c",
     "$animal_gate_monster_d",
   ],
+  community_name: "Triangle/Gate",
   xml_files: [
     "data/entities/animals/boss_gate/gate_monster_a.xml",
     "data/entities/animals/boss_gate/gate_monster_b.xml",
@@ -24,6 +25,9 @@ const gateBoss = {
     "data/entities/animals/boss_gate/gate_monster_d.xml",
   ],
   icon: `mods/${MOD_ID}/icons/gate_monster.png`,
+  killed() {
+    return this.names.every((name) => isFlagSet(name));
+  },
 };
 
 export const bosses = [
@@ -44,21 +48,21 @@ export const bosses = [
   mkBoss("boss_sky", "Rock", "boss_sky/boss_sky"),
 ];
 
-export const bossKilled = (name: string) =>
-  (GlobalsGetValue(`${MOD_ID}.killed.${name}`, "0") as any as string) !== "0";
-
-export const countBosses = () =>
-  bosses.filter(({ flag }) => bossKilled(flag)).length;
+export const countBosses = () => bosses.filter((b) => b.killed()).length;
 
 export const trackBoss = (name: string) => {
-  if (bossKilled(name)) {
+  if (isFlagSet(name)) {
     return false;
   }
 
-  GlobalsSetValue(`${MOD_ID}.killed.${name}`, "1");
+  setFlag(name);
 
-  return (
-    !gateBoss.names.includes(name) ||
-    gateBoss.names.every((name) => bossKilled(name))
-  );
+  // universal multi-entity boss handling 😂
+  return bosses.filter((b) => b.names.includes(name)).some((b) => b.killed());
 };
+
+export const isFlagSet = (name: string) =>
+  (GlobalsGetValue(`${MOD_ID}.killed.${name}`, "0") as any as string) !== "0";
+
+export const setFlag = (name: string, value: boolean = true) =>
+  GlobalsSetValue(`${MOD_ID}.killed.${name}`, value ? "1" : "0");
